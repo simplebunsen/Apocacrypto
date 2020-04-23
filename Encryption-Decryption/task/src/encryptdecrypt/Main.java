@@ -4,12 +4,26 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
 
-        String action = sc.nextLine();
+        String action = "enc";
+        String message = "";
+        int key = 0;
 
-        String message = sc.nextLine();
-        int key = sc.nextInt();
+        for (int i = 0; i < args.length; i++) {
+            String s = args[i];
+            switch (s) {
+                case "-mode":
+                    action = args[++i];
+                    break;
+                case "-key":
+                    key = Integer.parseInt(args[++i]);
+                    break;
+                case "-data":
+                    message = args[++i];
+                    break;
+            }
+        }
+
 
         switch(action){
             case "enc":
