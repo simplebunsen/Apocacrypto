@@ -11,12 +11,18 @@ public class Main {
 
         String action = "enc";
         String message = "";
+        String algorithm = "shift";
         int key = 0;
         String outFile = "";
+
+        Encrypter encrypter = new Encrypter();
 
         for (int i = 0; i < args.length; i++) {
             String s = args[i];
             switch (s) {
+                case "-alg":
+                    algorithm = args[++i];
+                    break;
                 case "-mode":
                     action = args[++i];
                     //System.out.println("loaded mode: " + action);
@@ -49,16 +55,27 @@ public class Main {
             }
         }
 
+        switch (algorithm){
+            case "shift":
+                encrypter.setMethod(new ShiftEncryptingMethod());
+                break;
+            case "unicode":
+                encrypter.setMethod(new UnicodeEncryptingMethod());
+                break;
+            default:
+                throw new IllegalStateException("Error: Unexpected value for algorithm: " + algorithm);
+        }
+
         String result;
         switch(action){
             case "enc":
-                result = encrypt(message, key);
+                result = encrypter.encrypt(message, key);
                 break;
             case "dec":
-                result = decrypt(message, key);
+                result = encrypter.decrypt(message, key);
                 break;
             default:
-                throw new IllegalStateException("Error: Unexpected value: " + action);
+                throw new IllegalStateException("Error: Unexpected value for enc/dec action: " + action);
         }
 
         outputResult(result, outFile);
@@ -80,45 +97,5 @@ public class Main {
         }
     }
 
-    private static String decrypt(String message, int key) {
-        String output = "";
 
-        for(char c : message.toCharArray()){
-            //97 - 122 lowercase letters
-            //32 - 126 basic symbols
-            if(c <= 126 && c >= 32){
-                char next;
-                if(c - key < 0){
-                    next = (char) (c - key + 95);
-                } else {
-                    next = (char) (c - key);
-                }
-                output = output.concat(String.valueOf(next));
-            }else{
-                output = output.concat(String.valueOf(c));
-            }
-        }
-        return output;
-    }
-
-    private static String encrypt(String message, int key) {
-        String output = "";
-
-        for(char c : message.toCharArray()){
-            //97 - 122 lowercase letters
-            //32 - 126 basic symbols
-            if(c <= 126 && c >= 32){
-                char next;
-                if(c + key > 126){
-                    next = (char) (c + key - 95);
-                } else {
-                    next = (char) (c + key);
-                }
-                output = output.concat(String.valueOf(next));
-            }else{
-                output = output.concat(String.valueOf(c));
-            }
-        }
-        return output;
-    }
 }
